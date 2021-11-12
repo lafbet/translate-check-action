@@ -1,0 +1,18 @@
+name: Transactions check
+description: Checking all transfer keys for compliance
+
+inputs:
+  path_to_files:
+    description: "Path to translations files"
+    required: true
+
+  main_file:
+    description: "Main translation file name"
+    required: true
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.path_to_files }}
+    - ${{ inputs.main_file }}
