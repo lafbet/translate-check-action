@@ -1,7 +1,4 @@
-FROM node:latest
-
-RUN apk add --no-cache \
-  bash 
+FROM node:15.14
 
 COPY ./ /
 
