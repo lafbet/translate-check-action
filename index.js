@@ -1,5 +1,6 @@
 const core = require("@actions/core");
 const get = require("lodash/get");
+const fs = require("fs");
 
 const getCheckFunc = (label, langObj) => {
   return function check(obj, prevKey) {
@@ -26,6 +27,20 @@ const getCheckFunc = (label, langObj) => {
 };
 
 function check(main, langsForCheck) {
+  if (!main) {
+    core.error(`Main file not found`);
+    core.setFailed("");
+
+    return;
+  }
+
+  if (!langsForCheck.length) {
+    core.error(`Langs for check not found`);
+    core.setFailed("");
+
+    return;
+  }
+
   langsForCheck = langsForCheck.map((item) => {
     const errors = [];
 
@@ -52,8 +67,6 @@ function check(main, langsForCheck) {
     }
   });
 }
-
-const fs = require("fs");
 
 const getJsonFromFile = (path) => JSON.parse(fs.readFileSync(path, "utf8"));
 

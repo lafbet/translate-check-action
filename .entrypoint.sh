@@ -1,11 +1,5 @@
 #!/bin/bash
 
-pwd
-
-ls -a
-
-ls -a /
-
 t_path=./translations
 
 mkdir $t_path
