@@ -1,17 +1,23 @@
 #!/bin/bash
 
+pwd
+
+ls -a
+
+ls -a /
+
 t_path=./translations
 
 mkdir $t_path
 
-cp ./${INPUT_PATH_TO_FILES}/* $t_path
+cp ${INPUT_PATH_TO_FILES}/* $t_path
 
 files=
 
 main=
 
 for FILE in $(find $t_path -type f -name "*.json")
-do 
+do
 
     if [[ $FILE = $t_path/$INPUT_MAIN_FILE ]]
     then
