@@ -15,7 +15,7 @@ const getCheckFunc = (label, langObj) => {
       } else if (typeof translate !== typeof obj) {
         _.set(errorsObj, `${label}.${prevKey}`, "-DIFFERENT_TYPE-");
       } else if (translate === obj) {
-        _.set(warningsObj, `${label}.${prevKey}`, obj);
+        _.setWith(warningsObj, `${label}.${prevKey}`, obj, Object);
       }
 
       return;
@@ -33,10 +33,11 @@ const getCheckFunc = (label, langObj) => {
       } else if (typeof translate !== typeof _.get(obj, key)) {
         _.set(errorObj, `${label}.${prevKey}.${key}`, "-DIFFERENT_TYPE-");
       } else if (translate === obj[key]) {
-        _.set(
+        _.setWith(
           warningsObj,
           `${label}.${prevKey}.${key}`,
-          JSON.stringify(translate)
+          JSON.stringify(translate),
+          Object
         );
       }
     });
@@ -61,15 +62,19 @@ function check(main, langsForCheck) {
   langsForCheck = langsForCheck.map((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
-    Object.keys(main).forEach((key) => check(main[key], key));
+    _.forIn(main, (key) => check(value, key));
   });
 
   if (!_.isEmpty(warningsObj)) {
-    core.warning(JSON.stringify(warningsObj));
+    _.forIn(warningsObj, (key, value) =>
+      core.warning(JSON.stringify({ [key]: value }, null, 2))
+    );
   }
 
   if (!_.isEmpty(errorsObj)) {
-    core.error(JSON.stringify(errorsObj));
+    _.forIn(errorsObj, (key, value) =>
+      core.error(JSON.stringify({ [key]: value }, null, 2))
+    );
   }
 }
 
