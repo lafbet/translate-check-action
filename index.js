@@ -62,7 +62,7 @@ function check(main, langsForCheck) {
   langsForCheck = langsForCheck.map((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
-    _.forIn(main, (key) => check(value, key));
+    _.forIn(main, (key, value) => check(value, key));
   });
 
   if (!_.isEmpty(warningsObj)) {
