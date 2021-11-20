@@ -65,11 +65,11 @@ function check(main, langsForCheck) {
   });
 
   if (!_.isEmpty(warningsObj)) {
-    core.warning(JSON.stringify(warningsObj, null, 2));
+    core.warning(JSON.stringify(warningsObj));
   }
 
   if (!_.isEmpty(errorsObj)) {
-    core.error(JSON.stringify(errorsObj, null, 2));
+    core.error(JSON.stringify(errorsObj));
   }
 }
 
