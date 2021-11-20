@@ -58,8 +58,6 @@ function check(main, langsForCheck) {
     return;
   }
 
-  console.log(langsForCheck);
-
   langsForCheck = langsForCheck.map((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
