@@ -62,17 +62,17 @@ function check(main, langsForCheck) {
   langsForCheck = langsForCheck.map((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
-    _.forIn(main, (key, value) => check(value, key));
+    _.forIn(main, (value, key) => check(value, key));
   });
 
   if (!_.isEmpty(warningsObj)) {
-    _.forIn(warningsObj, (key, value) =>
+    _.forIn(warningsObj, (value, key) =>
       core.warning(JSON.stringify({ [key]: value }, null, 2))
     );
   }
 
   if (!_.isEmpty(errorsObj)) {
-    _.forIn(errorsObj, (key, value) =>
+    _.forIn(errorsObj, (value, key) =>
       core.error(JSON.stringify({ [key]: value }, null, 2))
     );
   }
