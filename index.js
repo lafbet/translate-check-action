@@ -1,28 +1,45 @@
 const core = require("@actions/core");
-const get = require("lodash/get");
+const _ = require("lodash");
 const fs = require("fs");
+
+const errorsObj = {};
+const warningsObj = {};
 
 const getCheckFunc = (label, langObj) => {
   return function check(obj, prevKey) {
-    const keys = Object.keys(obj);
+    if (!_.isObject(obj)) {
+      const translate = _.get(langObj, `${prevKey}`);
 
-    for (let i = 0; i < keys.length; i++) {
-      const s = get(langObj, `${prevKey}.${keys[i]}`);
-
-      if (!s) return { success: false, path: `${prevKey}.${keys[i]}` };
-      if (typeof s === "string") {
-        if (s === obj[keys[i]]) {
-          core.warning(`${label} SAME TRANSLATE: ${prevKey}.${keys[i]}`);
-        }
-
-        continue;
+      if (!translate) {
+        _.set(errorsObj, `${label}.${prevKey}`, "-EMPTY-");
+      } else if (typeof translate !== typeof obj) {
+        _.set(errorsObj, `${label}.${prevKey}`, "-DIFFERENT_TYPE-");
+      } else if (translate === obj) {
+        _.set(warningsObj, `${label}.${prevKey}`, obj);
       }
 
-      if (!check(obj[keys[i]], `${prevKey}.${keys[i]}`))
-        return { success: false, path: `${prevKey}.${keys[i]}` };
+      return;
     }
 
-    return { success: true };
+    const keys = Object.keys(obj);
+
+    keys.forEach((key) => {
+      const translate = _.get(langObj, `${prevKey}.${key}`);
+
+      if (_.isObject(obj[key])) {
+        check(obj[key], `${prevKey}.${key}`);
+      } else if (!translate) {
+        _.set(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-");
+      } else if (typeof translate !== typeof _.get(obj, key)) {
+        _.set(errorObj, `${label}.${prevKey}.${key}`, "-DIFFERENT_TYPE-");
+      } else if (translate === obj[key]) {
+        _.set(
+          warningsObj,
+          `${label}.${prevKey}.${key}`,
+          JSON.stringify(translate)
+        );
+      }
+    });
   };
 };
 
@@ -41,34 +58,31 @@ function check(main, langsForCheck) {
     return;
   }
 
-  langsForCheck = langsForCheck.map((item) => {
-    const errors = [];
+  console.log(langsForCheck);
 
+  langsForCheck = langsForCheck.map((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
-    Object.keys(main).forEach((key) => {
-      const result = check(main[key], key);
-
-      if (!result.success) {
-        errors.push(result.path);
-      }
-    });
-
-    if (errors.length) {
-      core.error(`${item.label} errors: ${errors}`);
-    }
-
-    return errors;
+    Object.keys(main).forEach((key) => check(main[key], key));
   });
 
-  langsForCheck.forEach((item) => {
-    if (item.length) {
-      core.setFailed("");
-    }
-  });
+  if (!_.isEmpty(warningsObj)) {
+    core.warning(JSON.stringify(warningsObj, null, 2));
+  }
+
+  if (!_.isEmpty(errorsObj)) {
+    core.error(JSON.stringify(errorsObj, null, 2));
+  }
 }
 
 const getJsonFromFile = (path) => JSON.parse(fs.readFileSync(path, "utf8"));
+
+const getLabelFromPath = (path) => {
+  const arr = path.split("/");
+  const fileName = arr[arr.length - 1];
+
+  return fileName.match(/([\S]*).json$/)[1];
+};
 
 const getFiles = () => {
   const { argv } = process;
@@ -98,7 +112,7 @@ const getFiles = () => {
 
     if (filesPaths.length) {
       files = filesPaths.map((item) => ({
-        label: item,
+        label: getLabelFromPath(item),
         langObj: getJsonFromFile(item),
       }));
     }
