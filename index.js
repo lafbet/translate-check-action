@@ -21,24 +21,17 @@ const getCheckFunc = (label, langObj) => {
       return;
     }
 
-    const keys = Object.keys(obj);
-
-    keys.forEach((key) => {
+    _.forIn(obj, (value, key) => {
       const translate = _.get(langObj, `${prevKey}.${key}`);
 
-      if (_.isObject(obj[key])) {
-        check(obj[key], `${prevKey}.${key}`);
+      if (_.isObject(value)) {
+        check(value, `${prevKey}.${key}`);
       } else if (!translate) {
         _.set(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-");
       } else if (typeof translate !== typeof _.get(obj, key)) {
         _.set(errorObj, `${label}.${prevKey}.${key}`, "-DIFFERENT_TYPE-");
-      } else if (translate === obj[key]) {
-        _.setWith(
-          warningsObj,
-          `${label}.${prevKey}.${key}`,
-          JSON.stringify(translate),
-          Object
-        );
+      } else if (translate === value) {
+        _.setWith(warningsObj, `${label}.${prevKey}.${key}`, translate, Object);
       }
     });
   };
@@ -59,7 +52,7 @@ function check(main, langsForCheck) {
     return;
   }
 
-  langsForCheck = langsForCheck.map((item) => {
+  langsForCheck.forEach((item) => {
     const check = getCheckFunc(item.label, item.langObj);
 
     _.forIn(main, (value, key) => check(value, key));
@@ -67,13 +60,13 @@ function check(main, langsForCheck) {
 
   if (!_.isEmpty(warningsObj)) {
     _.forIn(warningsObj, (value, key) =>
-      core.warning(JSON.stringify({ [key]: value }, null, 2))
+      core.warning(JSON.stringify({ [key]: value }))
     );
   }
 
   if (!_.isEmpty(errorsObj)) {
     _.forIn(errorsObj, (value, key) =>
-      core.error(JSON.stringify({ [key]: value }, null, 2))
+      core.error(JSON.stringify({ [key]: value }))
     );
   }
 }
