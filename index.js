@@ -27,9 +27,14 @@ const getCheckFunc = (label, langObj) => {
       if (_.isObject(value)) {
         check(value, `${prevKey}.${key}`);
       } else if (!translate) {
-        _.set(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-");
+        _.setWith(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-", Object);
       } else if (typeof translate !== typeof _.get(obj, key)) {
-        _.set(errorObj, `${label}.${prevKey}.${key}`, "-DIFFERENT_TYPE-");
+        _.setWith(
+          errorObj,
+          `${label}.${prevKey}.${key}`,
+          "-DIFFERENT_TYPE-",
+          Object
+        );
       } else if (translate === value) {
         _.setWith(warningsObj, `${label}.${prevKey}.${key}`, translate, Object);
       }
