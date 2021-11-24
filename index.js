@@ -68,6 +68,8 @@ function check(main, langsForCheck) {
     _.forIn(errorsObj, (value, key) =>
       core.error(JSON.stringify({ [key]: value }))
     );
+
+    core.setFailed("");
   }
 }
 
