@@ -32,4 +32,4 @@ do
     funcsFiles=$funcsFiles" "$FILE
 done
 
-node ./checkFuncs.js -m $main -f $funcsFiles
+node /checkFuncs.js -m $main -f $funcsFiles
