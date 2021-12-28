@@ -31,6 +31,5 @@ for FILE in $(grep -l [[:space:]*\{\.\[]t\([\"\'].*[\"\']\) $(find ./src -iregex
 do
     funcsFiles=$funcsFiles" "$FILE
 done
-    echo $funcsFiles
 
 node /checkFuncs.js -m $main -f $funcsFiles
