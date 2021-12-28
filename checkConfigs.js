@@ -1,6 +1,8 @@
 const core = require("@actions/core");
 const _ = require("lodash");
-const fs = require("fs");
+
+const getFiles = require("./getFiles");
+const utils = require("./utils");
 
 const errorsObj = {};
 const warningsObj = {};
@@ -30,7 +32,7 @@ const getCheckFunc = (label, langObj) => {
         _.setWith(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-", Object);
       } else if (typeof translate !== typeof _.get(obj, key)) {
         _.setWith(
-          errorObj,
+          errorsObj,
           `${label}.${prevKey}.${key}`,
           "-DIFFERENT_TYPE-",
           Object
@@ -42,7 +44,7 @@ const getCheckFunc = (label, langObj) => {
   };
 };
 
-function check(main, langsForCheck) {
+function checkConfigs(main, langsForCheck) {
   if (!main) {
     core.error(`Main file not found`);
     core.setFailed("");
@@ -78,52 +80,12 @@ function check(main, langsForCheck) {
   }
 }
 
-const getJsonFromFile = (path) => JSON.parse(fs.readFileSync(path, "utf8"));
+const filesTransform = (paths) =>
+  paths.map((item) => ({
+    label: utils.getLabelFromPath(item),
+    langObj: utils.getJsonFromFile(item),
+  }));
 
-const getLabelFromPath = (path) => {
-  const arr = path.split("/");
-  const fileName = arr[arr.length - 1];
+const { main, files } = getFiles(utils.getJsonFromFile, filesTransform);
 
-  return fileName.match(/([\S]*).json$/)[1];
-};
-
-const getFiles = () => {
-  const { argv } = process;
-
-  const mainParamIndex = argv.findIndex((value) => value === "-m");
-  const fileParamIndex = argv.findIndex((value) => value === "-f");
-
-  let main;
-  let files;
-
-  if (mainParamIndex !== -1) {
-    main = getJsonFromFile(argv[mainParamIndex + 1]);
-  }
-
-  if (fileParamIndex !== -1) {
-    let filesPaths = [];
-
-    const endOfFilesIndex = argv
-      .slice(fileParamIndex + 1, argv.length)
-      .findIndex((value) => value.startsWith("-"));
-
-    if (endOfFilesIndex !== -1) {
-      filesPaths = argv.slice(fileParamIndex + 1, endOfFilesIndex + 1);
-    } else {
-      filesPaths = argv.slice(fileParamIndex + 1, argv.length);
-    }
-
-    if (filesPaths.length) {
-      files = filesPaths.map((item) => ({
-        label: getLabelFromPath(item),
-        langObj: getJsonFromFile(item),
-      }));
-    }
-  }
-
-  return { main, files };
-};
-
-const { main, files } = getFiles();
-
-check(main, files);
+checkConfigs(main, files);
