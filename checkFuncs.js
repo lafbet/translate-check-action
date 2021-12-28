@@ -24,10 +24,6 @@ const checkFiles = (mainConfig, files) => {
 
         if (!_.has(mainConfig, configField)) {
           errors = [...errors, `Error in ${item.path}: ${configField}`];
-        } else {
-          core.info(
-            `Success: ${configField}, ${_.get(mainConfig, configField)}`
-          );
         }
       });
     }
