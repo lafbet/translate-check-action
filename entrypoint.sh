@@ -27,9 +27,10 @@ node /checkConfigs.js -m $main -f $files
 
 funcsFiles=
 
-for FILE in $(find ./src -iregex ".*\.[t|j]sx?")
+for FILE in $(grep -l [[:space:]*\{\.\[]t\([\"\'].*[\"\']\) $(find ./src -iregex ".*\.[t|j]sx?"))
 do
     funcsFiles=$funcsFiles" "$FILE
 done
+    echo $funcsFiles
 
 node /checkFuncs.js -m $main -f $funcsFiles

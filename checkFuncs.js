@@ -16,7 +16,7 @@ const checkFiles = (mainConfig, files) => {
   files.forEach((item) => {
     console.log("Check:", item.path);
 
-    const allFuncs = item.content.match(/(^|\.|{|\[)t\(["']([\w.]+)["']\)/gm);
+    const allFuncs = item.content.match(/(^|\.|\{|\[|\s*)t\(["'](.*)["']\)/gm);
 
     if (allFuncs) {
       allFuncs.forEach((value) => {
