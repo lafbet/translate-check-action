@@ -8,7 +8,7 @@ cp ${INPUT_PATH_TO_FILES}/* $t_path
 
 files=
 
-main=./translations/en.json
+main=
 
 for FILE in $(find $t_path -type f -name "*.json")
 do
@@ -27,9 +27,9 @@ node /checkConfigs.js -m $main -f $files
 
 funcsFiles=
 
-for FILE in $(find . -type f -name "*.tsx")
+for FILE in $(find ./src -iregex ".*\.[t|j]sx?")
 do
     funcsFiles=$funcsFiles" "$FILE
 done
 
-node /checkFuncs.js -m $main -f $funcsFiles
+node ./checkFuncs.js -m $main -f $funcsFiles

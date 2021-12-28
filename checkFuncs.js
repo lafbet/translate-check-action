@@ -7,6 +7,12 @@ const utils = require("./utils");
 const checkFiles = (mainConfig, files) => {
   let isError = false;
 
+  if (!files) {
+    core.warning("There are no files to check");
+
+    return;
+  }
+
   files.forEach((item) => {
     console.log("Check:", item.path);
 
