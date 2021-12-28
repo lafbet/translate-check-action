@@ -16,13 +16,11 @@ const checkFiles = (mainConfig, files) => {
   files.forEach((item) => {
     console.log("Check:", item.path);
 
-    const allFuncs = item.content.match(
-      /(^|\.|\{|\[|\s*)t\(["'][\w.]+["']\)/gm
-    );
+    const allFuncs = item.content.match(/(^|\.|{|\[)t\(["']([\w.]+)["']\)/gm);
 
     if (allFuncs) {
       allFuncs.forEach((value) => {
-        const [, configField] = value.match(/t\(["'][\w.]+["']\)/);
+        const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
 
         if (!_.has(mainConfig, configField)) {
           errors = [...errors, `Error in ${item.path}: ${configField}`];
