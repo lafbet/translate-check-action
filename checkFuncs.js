@@ -4,6 +4,26 @@ const _ = require("lodash");
 const getFiles = require("./getFiles");
 const utils = require("./utils");
 
+const getErrorMessage = (path, fileContent, configValue) => {
+  const lines = fileContent.split("\n");
+
+  const targetLineIndex = lines.findIndex((line) => line.includes(configValue));
+
+  const errorMessage = [
+    lines[targetLineIndex - 2],
+    lines[targetLineIndex - 1],
+    lines[targetLineIndex],
+    lines[targetLineIndex]
+      .split("")
+      .map((item) => (item === " " ? " " : "^"))
+      .join(""),
+    lines[targetLineIndex + 1],
+    lines[targetLineIndex + 2],
+  ].join("\n");
+
+  return `Error in ${path}: \n ${errorMessage}`;
+};
+
 const checkFiles = (mainConfig, files) => {
   let errors = [];
 
@@ -16,21 +36,24 @@ const checkFiles = (mainConfig, files) => {
   files.forEach((item) => {
     console.log("Check:", item.path);
 
-    const allFuncs = item.content.match(/(^|\.|{|\[)t\(["']([\w.]+)["']\)/gm);
+    const allFuncs = item.content.match(/(^|\.|\{|\[)t\(["']([\w.]+)["']\)/gm);
 
     if (allFuncs) {
       allFuncs.forEach((value) => {
         const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
 
         if (!_.has(mainConfig, configField)) {
-          errors = [...errors, `Error in ${item.path}: ${configField}`];
+          errors = [
+            ...errors,
+            getErrorMessage(item.path, item.content, configField),
+          ];
         }
       });
     }
   });
 
   if (errors.length) {
-    errors.forEach(core.error);
+    errors.forEach((item) => core.error(item));
 
     core.setFailed("");
   }
