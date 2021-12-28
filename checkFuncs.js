@@ -20,7 +20,7 @@ const checkFiles = (mainConfig, files) => {
 
     if (allFuncs) {
       allFuncs.forEach((value) => {
-        const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
+        const [, configField] = value.match(/t\(["'](.*)["']\)/);
 
         if (!_.has(mainConfig, configField)) {
           errors = [...errors, `Error in ${item.path}: ${configField}`];
