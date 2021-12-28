@@ -23,7 +23,7 @@ const checkFiles = (mainConfig, files) => {
         const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
 
         if (!_.has(mainConfig, configField)) {
-          errors = [...errors, `Error in ${item.path}: ${value}`];
+          errors = [...errors, `Error in ${item.path}: ${configField}`];
         }
       });
     }
