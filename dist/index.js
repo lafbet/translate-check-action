@@ -1,156 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 420:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const core = __nccwpck_require__(186);
-const _ = __nccwpck_require__(250);
-
-const errorsObj = {};
-const warningsObj = {};
-
-const getCheckFunc = (label, langObj) => {
-  return function check(obj, prevKey) {
-    if (!_.isObject(obj)) {
-      const translate = _.get(langObj, `${prevKey}`);
-
-      if (!translate) {
-        _.set(errorsObj, `${label}.${prevKey}`, "-EMPTY-");
-      } else if (typeof translate !== typeof obj) {
-        _.set(errorsObj, `${label}.${prevKey}`, "-DIFFERENT_TYPE-");
-      } else if (translate === obj) {
-        _.setWith(warningsObj, `${label}.${prevKey}`, obj, Object);
-      }
-
-      return;
-    }
-
-    _.forIn(obj, (value, key) => {
-      const translate = _.get(langObj, `${prevKey}.${key}`);
-
-      if (_.isObject(value)) {
-        check(value, `${prevKey}.${key}`);
-      } else if (!translate) {
-        _.setWith(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-", Object);
-      } else if (typeof translate !== typeof _.get(obj, key)) {
-        _.setWith(
-          errorsObj,
-          `${label}.${prevKey}.${key}`,
-          "-DIFFERENT_TYPE-",
-          Object
-        );
-      } else if (translate === value) {
-        _.setWith(warningsObj, `${label}.${prevKey}.${key}`, translate, Object);
-      }
-    });
-  };
-};
-
-module.exports = (main, langsForCheck) => {
-  if (!main) {
-    core.error(`Main file not found`);
-    core.setFailed("");
-
-    return;
-  }
-
-  if (!langsForCheck.length) {
-    core.error(`Langs for check not found`);
-    core.setFailed("");
-
-    return;
-  }
-
-  langsForCheck.forEach((item) => {
-    const check = getCheckFunc(item.label, item.langObj);
-
-    _.forIn(main, (value, key) => check(value, key));
-  });
-
-  if (!_.isEmpty(warningsObj)) {
-    _.forIn(warningsObj, (value, key) =>
-      core.warning(JSON.stringify({ [key]: value }))
-    );
-  }
-
-  if (!_.isEmpty(errorsObj)) {
-    _.forIn(errorsObj, (value, key) =>
-      core.error(JSON.stringify({ [key]: value }))
-    );
-  }
-
-  return !_.isEmpty(errorsObj);
-};
-
-
-/***/ }),
-
-/***/ 330:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const core = __nccwpck_require__(186);
-const _ = __nccwpck_require__(250);
-
-const getErrorMessage = (path, fileContent, configValue) => {
-  const lines = fileContent.split("\n");
-
-  const targetLineIndex = lines.findIndex((line) => line.includes(configValue));
-
-  const errorMessage = [
-    lines[targetLineIndex - 2],
-    lines[targetLineIndex - 1],
-    lines[targetLineIndex],
-    lines[targetLineIndex]
-      .split("")
-      .map((item) => (item === " " ? " " : "^"))
-      .join(""),
-    lines[targetLineIndex + 1],
-    lines[targetLineIndex + 2],
-  ].join("\n");
-
-  return `Error in ${path}: \n ${errorMessage}`;
-};
-
-module.exports = (mainConfig, files) => {
-  let errors = [];
-
-  if (!files) {
-    core.warning("There are no files to check");
-
-    return;
-  }
-
-  files.forEach((item) => {
-    console.log("Check:", item.path);
-
-    const allFuncs = item.content.match(/(^|\.|\{|\[)t\(["']([\w.]+)["']\)/gm);
-
-    if (allFuncs) {
-      allFuncs.forEach((value) => {
-        const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
-
-        if (!_.has(mainConfig, configField)) {
-          errors = [
-            ...errors,
-            getErrorMessage(item.path, item.content, configField),
-          ];
-        }
-      });
-    }
-  });
-
-  if (errors.length) {
-    errors.forEach((item) => core.error(item));
-  }
-
-  return !_.isEmpty(errors);
-};
-
-
-/***/ }),
-
-/***/ 351:
+/***/ 241:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -284,7 +135,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(351);
+const command_1 = __nccwpck_require__(241);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
 const os = __importStar(__nccwpck_require__(37));
@@ -18921,7 +18772,156 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 252:
+/***/ 194:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(186);
+const _ = __nccwpck_require__(250);
+
+const errorsObj = {};
+const warningsObj = {};
+
+const getCheckFunc = (label, langObj) => {
+  return function check(obj, prevKey) {
+    if (!_.isObject(obj)) {
+      const translate = _.get(langObj, `${prevKey}`);
+
+      if (!translate) {
+        _.set(errorsObj, `${label}.${prevKey}`, "-EMPTY-");
+      } else if (typeof translate !== typeof obj) {
+        _.set(errorsObj, `${label}.${prevKey}`, "-DIFFERENT_TYPE-");
+      } else if (translate === obj) {
+        _.setWith(warningsObj, `${label}.${prevKey}`, obj, Object);
+      }
+
+      return;
+    }
+
+    _.forIn(obj, (value, key) => {
+      const translate = _.get(langObj, `${prevKey}.${key}`);
+
+      if (_.isObject(value)) {
+        check(value, `${prevKey}.${key}`);
+      } else if (!translate) {
+        _.setWith(errorsObj, `${label}.${prevKey}.${key}`, "-EMPTY-", Object);
+      } else if (typeof translate !== typeof _.get(obj, key)) {
+        _.setWith(
+          errorsObj,
+          `${label}.${prevKey}.${key}`,
+          "-DIFFERENT_TYPE-",
+          Object
+        );
+      } else if (translate === value) {
+        _.setWith(warningsObj, `${label}.${prevKey}.${key}`, translate, Object);
+      }
+    });
+  };
+};
+
+module.exports = (main, langsForCheck) => {
+  if (!main) {
+    core.error(`Main file not found`);
+    core.setFailed("");
+
+    return;
+  }
+
+  if (!langsForCheck.length) {
+    core.error(`Langs for check not found`);
+    core.setFailed("");
+
+    return;
+  }
+
+  langsForCheck.forEach((item) => {
+    const check = getCheckFunc(item.label, item.langObj);
+
+    _.forIn(main, (value, key) => check(value, key));
+  });
+
+  if (!_.isEmpty(warningsObj)) {
+    _.forIn(warningsObj, (value, key) =>
+      core.warning(JSON.stringify({ [key]: value }))
+    );
+  }
+
+  if (!_.isEmpty(errorsObj)) {
+    _.forIn(errorsObj, (value, key) =>
+      core.error(JSON.stringify({ [key]: value }))
+    );
+  }
+
+  return !_.isEmpty(errorsObj);
+};
+
+
+/***/ }),
+
+/***/ 447:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(186);
+const _ = __nccwpck_require__(250);
+
+const getErrorMessage = (path, fileContent, configValue) => {
+  const lines = fileContent.split("\n");
+
+  const targetLineIndex = lines.findIndex((line) => line.includes(configValue));
+
+  const errorMessage = [
+    lines[targetLineIndex - 2],
+    lines[targetLineIndex - 1],
+    lines[targetLineIndex],
+    lines[targetLineIndex]
+      .split("")
+      .map((item) => (item === " " ? " " : "^"))
+      .join(""),
+    lines[targetLineIndex + 1],
+    lines[targetLineIndex + 2],
+  ].join("\n");
+
+  return `Error in ${path}: \n ${errorMessage}`;
+};
+
+module.exports = (mainConfig, files) => {
+  let errors = [];
+
+  if (!files) {
+    core.warning("There are no files to check");
+
+    return;
+  }
+
+  files.forEach((item) => {
+    console.log("Check:", item.path);
+
+    const allFuncs = item.content.match(/(^|\.|\{|\[)t\(["']([\w.]+)["']\)/gm);
+
+    if (allFuncs) {
+      allFuncs.forEach((value) => {
+        const [, configField] = value.match(/t\(["']([\w.]+)["']\)/);
+
+        if (!_.has(mainConfig, configField)) {
+          errors = [
+            ...errors,
+            getErrorMessage(item.path, item.content, configField),
+          ];
+        }
+      });
+    }
+  });
+
+  if (errors.length) {
+    errors.forEach((item) => core.error(item));
+  }
+
+  return !_.isEmpty(errors);
+};
+
+
+/***/ }),
+
+/***/ 608:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const fs = __nccwpck_require__(147);
@@ -19086,9 +19086,9 @@ var __webpack_exports__ = {};
 const execSync = (__nccwpck_require__(81).execSync);
 const core = __nccwpck_require__(186);
 
-const utils = __nccwpck_require__(252);
-const checkConfigs = __nccwpck_require__(420);
-const checkSource = __nccwpck_require__(330);
+const utils = __nccwpck_require__(608);
+const checkConfigs = __nccwpck_require__(194);
+const checkSource = __nccwpck_require__(447);
 
 const getMain = (name, pathToTranslates) => {
   const result = utils.getJsonFromFile(`${pathToTranslates}/${name}`);
