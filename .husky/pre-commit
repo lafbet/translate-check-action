@@ -1,3 +1,5 @@
 #!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-ncc build index.js
+npm run build
+git add dist
