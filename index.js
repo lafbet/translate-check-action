@@ -49,11 +49,11 @@ const main = () => {
     content: utils.getTextFromFile(item),
   }));
 
-  core.group("Configs check");
+  core.startGroup("Configs check");
   const isConfigsError = checkConfigs(mainConfig, configsCheckContent);
   core.endGroup();
 
-  core.group("Source check");
+  core.startGroup("Source check");
   const isSourceError = checkSource(mainConfig, filesCheckContent);
   core.endGroup();
 
