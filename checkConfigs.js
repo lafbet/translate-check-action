@@ -45,6 +45,8 @@ const getCheckFunc = (label, langObj) => {
 };
 
 function checkConfigs(main, langsForCheck) {
+  core.startGroup("Check translate configs");
+
   if (!main) {
     core.error(`Main file not found`);
     core.setFailed("");
@@ -78,6 +80,8 @@ function checkConfigs(main, langsForCheck) {
 
     core.setFailed("");
   }
+
+  core.endGroup();
 }
 
 const filesTransform = (paths) =>

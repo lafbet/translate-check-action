@@ -25,6 +25,7 @@ const getErrorMessage = (path, fileContent, configValue) => {
 };
 
 const checkFiles = (mainConfig, files) => {
+  core.startGroup('Check "t" functions');
   let errors = [];
 
   if (!files) {
@@ -57,6 +58,7 @@ const checkFiles = (mainConfig, files) => {
 
     core.setFailed("");
   }
+  core.endGroup();
 };
 
 const transformFiles = (paths) =>
