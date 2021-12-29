@@ -19117,7 +19117,7 @@ const getFiles = (path) => {
 
 const main = () => {
   const mainConfigName = core.getInput("main_file");
-  const pathToFiles = core.getInput("path_to_files");
+  const pathToFiles = core.getInput("path_to_configs");
   const pathSource = core.getInput("source_path");
 
   const mainConfig = getMain(mainConfigName, pathToFiles);
