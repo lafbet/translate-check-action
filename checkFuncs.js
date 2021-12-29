@@ -1,9 +1,6 @@
 const core = require("@actions/core");
 const _ = require("lodash");
 
-const getFiles = require("./getFiles");
-const utils = require("./utils");
-
 const getErrorMessage = (path, fileContent, configValue) => {
   const lines = fileContent.split("\n");
 
@@ -24,8 +21,7 @@ const getErrorMessage = (path, fileContent, configValue) => {
   return `Error in ${path}: \n ${errorMessage}`;
 };
 
-const checkFiles = (mainConfig, files) => {
-  core.startGroup('Check "t" functions');
+module.exports = (mainConfig, files) => {
   let errors = [];
 
   if (!files) {
@@ -55,18 +51,7 @@ const checkFiles = (mainConfig, files) => {
 
   if (errors.length) {
     errors.forEach((item) => core.error(item));
-
-    core.setFailed("");
   }
-  core.endGroup();
+
+  return !_.isEmpty(errors);
 };
-
-const transformFiles = (paths) =>
-  paths.map((item) => ({
-    path: item,
-    content: utils.getTextFromFile(item),
-  }));
-
-const { main, files } = getFiles(utils.getJsonFromFile, transformFiles);
-
-checkFiles(main, files);

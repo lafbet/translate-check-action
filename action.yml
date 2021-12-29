@@ -2,7 +2,7 @@ name: Transactions check
 description: Checking all transfer keys for compliance
 
 inputs:
-  path_to_files:
+  path_to_configs:
     description: "Path to translations files"
     required: true
 
@@ -10,9 +10,10 @@ inputs:
     description: "Main translation file name"
     required: true
 
+  source_path:
+    description: "Source code path"
+    required: true
+
 runs:
-  using: "docker"
-  image: "Dockerfile"
-  args:
-    - ${{ inputs.path_to_files }}
-    - ${{ inputs.main_file }}
+  using: "node12"
+  main: "dist/index.js"

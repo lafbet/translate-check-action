@@ -1,9 +1,6 @@
 const core = require("@actions/core");
 const _ = require("lodash");
 
-const getFiles = require("./getFiles");
-const utils = require("./utils");
-
 const errorsObj = {};
 const warningsObj = {};
 
@@ -44,9 +41,7 @@ const getCheckFunc = (label, langObj) => {
   };
 };
 
-function checkConfigs(main, langsForCheck) {
-  core.startGroup("Check translate configs");
-
+module.exports = (main, langsForCheck) => {
   if (!main) {
     core.error(`Main file not found`);
     core.setFailed("");
@@ -77,19 +72,7 @@ function checkConfigs(main, langsForCheck) {
     _.forIn(errorsObj, (value, key) =>
       core.error(JSON.stringify({ [key]: value }))
     );
-
-    core.setFailed("Error in configs");
   }
 
-  core.endGroup();
-}
-
-const filesTransform = (paths) =>
-  paths.map((item) => ({
-    label: utils.getLabelFromPath(item),
-    langObj: utils.getJsonFromFile(item),
-  }));
-
-const { main, files } = getFiles(utils.getJsonFromFile, filesTransform);
-
-checkConfigs(main, files);
+  return !_.isEmpty(errorsObj);
+};
