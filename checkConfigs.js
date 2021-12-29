@@ -78,7 +78,7 @@ function checkConfigs(main, langsForCheck) {
       core.error(JSON.stringify({ [key]: value }))
     );
 
-    core.setFailed("");
+    core.setFailed("Error in configs");
   }
 
   core.endGroup();
