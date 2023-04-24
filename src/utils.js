@@ -1,4 +1,5 @@
 const fs = require("fs");
+const fetch = require("node-fetch");
 
 module.exports = {
   getJsonFromFile: async (name, host) => {

@@ -1,5 +1,6 @@
 const execSync = require("child_process").execSync;
 const core = require("@actions/core");
+const fetch = require("node-fetch");
 
 const utils = require("./utils");
 const checkConfigs = require("./checkConfigs");
