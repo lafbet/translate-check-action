@@ -8,6 +8,8 @@ const checkSource = require("./checkFuncs");
 const getMain = (name, pathToTranslates) => {
   const result = utils.getJsonFromFile(`${pathToTranslates}/${name}`);
 
+  console.log(name);
+
   return result;
 };
 
