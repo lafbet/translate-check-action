@@ -1,13 +1,13 @@
 const fs = require("fs");
 
 module.exports = {
-  getJsonFromFile: (path) => JSON.parse(fs.readFileSync(path, "utf8")),
+  getJsonFromFile: async (name, host) => {
+    const response = await fetch(
+      `https://t.lafa.bet/api/locale/result?host=${host}&code=${name}`
+    );
+    const result = await response.json();
 
-  getLabelFromPath: (path) => {
-    const arr = path.split("/");
-    const fileName = arr[arr.length - 1];
-
-    return fileName.match(/([\S]*).json$/)[1];
+    return JSON.parse(result);
   },
 
   getTextFromFile: (path) => fs.readFileSync(path, "utf8"),
