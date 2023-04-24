@@ -1,22 +1,50 @@
 const execSync = require("child_process").execSync;
 const core = require("@actions/core");
-const fetch = require("node-fetch");
+const fs = require("fs");
+const axios = require("axios");
 
-const utils = require("./utils");
 const checkConfigs = require("./checkConfigs");
 const checkSource = require("./checkFuncs");
 
+async function getJsonFromFile(name, host) {
+  const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+const utils = {
+  getLabelFromPath: (path) => {
+    const arr = path.split("/");
+    const fileName = arr[arr.length - 1];
+
+    return fileName.match(/([\S]*).json$/)[1];
+  },
+
+  getTextFromFile: (path) => fs.readFileSync(path, "utf8"),
+};
+
 const getMain = async (name, host) => {
-  const result = await utils.getJsonFromFile(name, host);
+  const result = await getJsonFromFile(name, host);
 
   return result;
 };
 
 const getConfigs = async (mainConfigName) => {
-  const response = await fetch(`https://t.lafa.bet/api/locale`);
-  const result = Object.keys(await response.json());
-
-  return result.filter((item) => item !== mainConfigName);
+  const url = `https://t.lafa.bet/api/locale`;
+  try {
+    const response = await axios.get(url);
+    return Object.keys(response.data.result).filter(
+      (item) => item !== mainConfigName
+    );
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 const getFiles = (path) => {
@@ -29,7 +57,6 @@ const getFiles = (path) => {
 };
 
 const main = async () => {
-  console.log(1111);
   const mainConfigName = core.getInput("main_file");
   const pathSource = core.getInput("source_path");
   const host = core.getInput("host");
@@ -38,13 +65,9 @@ const main = async () => {
   const allConfigs = await getConfigs(mainConfigName);
   const sourceFilesPaths = getFiles(pathSource);
 
-  const langObj = async (item) => {
-    return await utils.getJsonFromFile(item);
-  };
-
   const configsCheckContent = allConfigs.map(async (item) => ({
     label: item,
-    langObj: await langObj(item),
+    langObj: await getJsonFromFile(item),
   }));
 
   const filesCheckContent = sourceFilesPaths.map((item) => ({

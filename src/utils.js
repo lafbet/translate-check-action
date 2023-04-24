@@ -1,15 +1,1 @@
-const fs = require("fs");
-const fetch = require("node-fetch");
-
-module.exports = {
-  getJsonFromFile: async (name, host) => {
-    const response = await fetch(
-      `https://t.lafa.bet/api/locale/result?host=${host}&code=${name}`
-    );
-    const result = await response.json();
-
-    return JSON.parse(result);
-  },
-
-  getTextFromFile: (path) => fs.readFileSync(path, "utf8"),
-};
+module.exports = {};
