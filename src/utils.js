@@ -7,6 +7,8 @@ module.exports = {
     );
     const result = await response.json();
 
+    console.log(result);
+
     return JSON.parse(result);
   },
 
