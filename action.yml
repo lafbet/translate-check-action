@@ -2,8 +2,8 @@ name: Transactions check
 description: Checking all transfer keys for compliance
 
 inputs:
-  path_to_configs:
-    description: "Path to translations files"
+  host:
+    description: "Lafa or Valor translations"
     required: true
 
   main_file:
