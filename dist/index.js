@@ -26768,7 +26768,7 @@ async function getJsonFromFile(name, host) {
   const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
   try {
     const response = await axios.get(url);
-    return response.data;
+    return response;
   } catch (error) {
     console.error(error);
     return null;
@@ -26796,9 +26796,7 @@ const getConfigs = async (mainConfigName) => {
   const url = `https://t.lafa.bet/api/locale`;
   try {
     const response = await axios.get(url);
-    return Object.keys(response.data.result).filter(
-      (item) => item !== mainConfigName
-    );
+    return Object.keys(response.data).filter((item) => item !== mainConfigName);
   } catch (error) {
     console.error(error);
     return null;
@@ -26825,7 +26823,7 @@ const main = async () => {
 
   const configsCheckContent = allConfigs.map(async (item) => ({
     label: item,
-    langObj: await getJsonFromFile(item),
+    langObj: await getJsonFromFile(item, host),
   }));
 
   const filesCheckContent = sourceFilesPaths.map((item) => ({
