@@ -28,6 +28,7 @@ const getFiles = (path) => {
 };
 
 const main = async () => {
+  console.log(1111);
   const mainConfigName = core.getInput("main_file");
   const pathSource = core.getInput("source_path");
   const host = core.getInput("host");
