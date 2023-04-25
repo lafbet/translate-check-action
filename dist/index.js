@@ -26765,20 +26765,26 @@ const checkConfigs = __nccwpck_require__(2194);
 const checkSource = __nccwpck_require__(8447);
 
 async function getJsonFromFile(name, host) {
-  const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
+  const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${
+    host === "valor" ? "lafa" : "valor"
+  }`;
+  const url2 = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
   try {
-    const response = await axios.get(url);
+    const responses = await Promise.all([axios.get(url), axios.get(url2)]);
 
-    return response.data;
+    const data1 = responses[0].data;
+    const data2 = responses[1].data;
+
+    const mergedData = Object.assign({}, data1, data2);
+
+    return mergedData;
   } catch (error) {
     console.error(error);
     return null;
   }
 }
 
-const utils = {
-  getTextFromFile: (path) => fs.readFileSync(path, "utf8"),
-};
+const getTextFromFile = (path) => fs.readFileSync(path, "utf8");
 
 const getMain = async (name, host) => {
   const result = await getJsonFromFile(name, host);
@@ -26811,10 +26817,6 @@ const main = async () => {
   const pathSource = core.getInput("source_path");
   const host = core.getInput("host");
 
-  // const mainConfigName = "en";
-  // const pathSource = "./temp";
-  // const host = "lafa";
-
   const mainConfig = await getMain(mainConfigName, host);
   const allConfigs = await getConfigs(mainConfigName);
   const sourceFilesPaths = getFiles(pathSource);
@@ -26828,7 +26830,7 @@ const main = async () => {
 
   const filesCheckContent = sourceFilesPaths.map((item) => ({
     path: item,
-    content: utils.getTextFromFile(item),
+    content: getTextFromFile(item),
   }));
 
   core.startGroup("Configs check");
