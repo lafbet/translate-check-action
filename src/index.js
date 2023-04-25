@@ -1,24 +1,74 @@
+/* eslint-disable no-prototype-builtins */
 const execSync = require("child_process").execSync;
 const core = require("@actions/core");
+const fs = require("fs");
+const axios = require("axios");
 
-const utils = require("./utils");
 const checkConfigs = require("./checkConfigs");
 const checkSource = require("./checkFuncs");
 
-const getMain = (name, pathToTranslates) => {
-  const result = utils.getJsonFromFile(`${pathToTranslates}/${name}`);
+function mergeObjects(obj1, obj2) {
+  const newObj = {};
+  for (let key in obj1) {
+    if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+      newObj[key] = mergeObjects(obj1[key], obj2[key]);
+    } else if (obj2.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    } else {
+      newObj[key] = obj1[key];
+    }
+  }
+  for (let key in obj2) {
+    if (typeof obj2[key] === "object" && !obj1.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    }
+  }
+  return newObj;
+}
+
+async function getJsonFromFile(name, host) {
+  const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
+  const urlLafa = `https://t.lafa.bet/api/locale/result?code=${name}&host=lafa`;
+  try {
+    const responses = await Promise.all([
+      axios.get(urlValor),
+      axios.get(urlLafa),
+    ]);
+
+    const dataValor = responses[0].data;
+    const dataLafa = responses[1].data;
+
+    const mergedValor = mergeObjects(dataLafa, dataValor);
+    const mergedLafa = mergeObjects(dataValor, dataLafa);
+
+    if (host === "valor") {
+      return mergedValor;
+    }
+
+    return mergedLafa;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+const getTextFromFile = (path) => fs.readFileSync(path, "utf8");
+
+const getMain = async (name, host) => {
+  const result = await getJsonFromFile(name, host);
 
   return result;
 };
 
-const getConfigs = (mainConfigName, pathToTranslates) => {
-  const result = execSync(`find ${pathToTranslates} -type f -name '*.json'`, {
-    encoding: "utf8",
-  });
-
-  return result
-    .split("\n")
-    .filter((item) => item && utils.getLabelFromPath(item) !== mainConfigName);
+const getConfigs = async (mainConfigName) => {
+  const url = `https://t.lafa.bet/api/locale`;
+  try {
+    const response = await axios.get(url);
+    return Object.keys(response.data).filter((item) => item !== mainConfigName);
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 const getFiles = (path) => {
@@ -30,23 +80,25 @@ const getFiles = (path) => {
   return result.split("\n").filter(Boolean);
 };
 
-const main = () => {
+const main = async () => {
   const mainConfigName = core.getInput("main_file");
-  const pathToFiles = core.getInput("path_to_configs");
   const pathSource = core.getInput("source_path");
+  const host = core.getInput("host");
 
-  const mainConfig = getMain(mainConfigName, pathToFiles);
-  const allConfigs = getConfigs(mainConfigName, pathToFiles);
+  const mainConfig = await getMain(mainConfigName, host);
+  const allConfigs = await getConfigs(mainConfigName);
   const sourceFilesPaths = getFiles(pathSource);
 
-  const configsCheckContent = allConfigs.map((item) => ({
-    label: utils.getLabelFromPath(item),
-    langObj: utils.getJsonFromFile(item),
-  }));
+  const configsCheckContent = await Promise.all(
+    allConfigs.map(async (item) => ({
+      label: item,
+      langObj: await getJsonFromFile(item, host),
+    }))
+  );
 
   const filesCheckContent = sourceFilesPaths.map((item) => ({
     path: item,
-    content: utils.getTextFromFile(item),
+    content: getTextFromFile(item),
   }));
 
   core.startGroup("Configs check");
