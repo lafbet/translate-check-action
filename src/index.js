@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const execSync = require("child_process").execSync;
 const core = require("@actions/core");
 const fs = require("fs");
@@ -5,6 +6,25 @@ const axios = require("axios");
 
 const checkConfigs = require("./checkConfigs");
 const checkSource = require("./checkFuncs");
+
+function mergeObjects(obj1, obj2) {
+  const newObj = {};
+  for (let key in obj1) {
+    if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+      newObj[key] = mergeObjects(obj1[key], obj2[key]);
+    } else if (obj2.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    } else {
+      newObj[key] = obj1[key];
+    }
+  }
+  for (let key in obj2) {
+    if (typeof obj2[key] === "object" && !obj1.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    }
+  }
+  return newObj;
+}
 
 async function getJsonFromFile(name, host) {
   const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
@@ -18,8 +38,8 @@ async function getJsonFromFile(name, host) {
     const dataValor = responses[0].data;
     const dataLafa = responses[1].data;
 
-    const mergedValor = Object.assign({}, dataLafa, dataValor);
-    const mergedLafa = Object.assign({}, dataValor, dataLafa);
+    const mergedValor = mergeObjects(dataLafa, dataValor);
+    const mergedLafa = mergeObjects(dataValor, dataLafa);
 
     if (host === "valor") {
       return mergedValor;

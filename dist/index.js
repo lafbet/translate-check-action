@@ -26756,6 +26756,7 @@ module.exports = JSON.parse('{"application/1d-interleaved-parityfec":{"source":"
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+/* eslint-disable no-prototype-builtins */
 const execSync = (__nccwpck_require__(2081).execSync);
 const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(7147);
@@ -26763,6 +26764,25 @@ const axios = __nccwpck_require__(8757);
 
 const checkConfigs = __nccwpck_require__(2194);
 const checkSource = __nccwpck_require__(8447);
+
+function mergeObjects(obj1, obj2) {
+  const newObj = {};
+  for (let key in obj1) {
+    if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+      newObj[key] = mergeObjects(obj1[key], obj2[key]);
+    } else if (obj2.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    } else {
+      newObj[key] = obj1[key];
+    }
+  }
+  for (let key in obj2) {
+    if (typeof obj2[key] === "object" && !obj1.hasOwnProperty(key)) {
+      newObj[key] = obj2[key];
+    }
+  }
+  return newObj;
+}
 
 async function getJsonFromFile(name, host) {
   const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
@@ -26776,8 +26796,8 @@ async function getJsonFromFile(name, host) {
     const dataValor = responses[0].data;
     const dataLafa = responses[1].data;
 
-    const mergedValor = Object.assign({}, dataLafa, dataValor);
-    const mergedLafa = Object.assign({}, dataValor, dataLafa);
+    const mergedValor = mergeObjects(dataLafa, dataValor);
+    const mergedLafa = mergeObjects(dataValor, dataLafa);
 
     if (host === "valor") {
       return mergedValor;
