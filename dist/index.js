@@ -26765,23 +26765,21 @@ const axios = __nccwpck_require__(8757);
 const checkConfigs = __nccwpck_require__(2194);
 const checkSource = __nccwpck_require__(8447);
 
-function mergeObjects(obj1, obj2) {
-  const newObj = {};
-  for (let key in obj1) {
-    if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
-      newObj[key] = mergeObjects(obj1[key], obj2[key]);
-    } else if (obj2.hasOwnProperty(key)) {
-      newObj[key] = obj2[key];
+function mergeObjects(object1, object2) {
+  const result = { ...object1 };
+  for (const prop in object2) {
+    if (Array.isArray(object2[prop])) {
+      result[prop] = object2[prop];
+    } else if (object2[prop] !== null && typeof object2[prop] === "object") {
+      if (!result[prop]) {
+        result[prop] = {};
+      }
+      result[prop] = mergeObjects(result[prop], object2[prop]);
     } else {
-      newObj[key] = obj1[key];
+      result[prop] = object2[prop];
     }
   }
-  for (let key in obj2) {
-    if (typeof obj2[key] === "object" && !obj1.hasOwnProperty(key)) {
-      newObj[key] = obj2[key];
-    }
-  }
-  return newObj;
+  return result;
 }
 
 async function getJsonFromFile(name, host) {
@@ -26800,9 +26798,11 @@ async function getJsonFromFile(name, host) {
     const mergedLafa = mergeObjects(dataValor, dataLafa);
 
     if (host === "valor") {
+      fs.writeFileSync("mergedFile.json", JSON.stringify(mergedValor));
       return mergedValor;
     }
 
+    fs.writeFileSync("mergedFile.json", JSON.stringify(mergedLafa));
     return mergedLafa;
   } catch (error) {
     console.error(error);
