@@ -7,19 +7,25 @@ const checkConfigs = require("./checkConfigs");
 const checkSource = require("./checkFuncs");
 
 async function getJsonFromFile(name, host) {
-  const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${
-    host === "valor" ? "lafa" : "valor"
-  }`;
-  const url2 = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
+  const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
+  const urlLafa = `https://t.lafa.bet/api/locale/result?code=${name}&host=lafa`;
   try {
-    const responses = await Promise.all([axios.get(url), axios.get(url2)]);
+    const responses = await Promise.all([
+      axios.get(urlValor),
+      axios.get(urlLafa),
+    ]);
 
-    const data1 = responses[0].data;
-    const data2 = responses[1].data;
+    const dataValor = responses[0].data;
+    const dataLafa = responses[1].data;
 
-    const mergedData = Object.assign({}, data1, data2);
+    const mergedValor = Object.assign({}, dataLafa, dataValor);
+    const mergedLafa = Object.assign({}, dataValor, dataLafa);
 
-    return mergedData;
+    if (host === "valor") {
+      return mergedValor;
+    }
+
+    return mergedLafa;
   } catch (error) {
     console.error(error);
     return null;
