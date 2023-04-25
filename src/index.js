@@ -10,7 +10,8 @@ async function getJsonFromFile(name, host) {
   const url = `https://t.lafa.bet/api/locale/result?code=${name}&host=${host}`;
   try {
     const response = await axios.get(url);
-    return response;
+
+    return response.data;
   } catch (error) {
     console.error(error);
     return null;
@@ -18,13 +19,6 @@ async function getJsonFromFile(name, host) {
 }
 
 const utils = {
-  getLabelFromPath: (path) => {
-    const arr = path.split("/");
-    const fileName = arr[arr.length - 1];
-
-    return fileName.match(/([\S]*).json$/)[1];
-  },
-
   getTextFromFile: (path) => fs.readFileSync(path, "utf8"),
 };
 
@@ -59,14 +53,20 @@ const main = async () => {
   const pathSource = core.getInput("source_path");
   const host = core.getInput("host");
 
+  // const mainConfigName = "en";
+  // const pathSource = "./temp";
+  // const host = "lafa";
+
   const mainConfig = await getMain(mainConfigName, host);
   const allConfigs = await getConfigs(mainConfigName);
   const sourceFilesPaths = getFiles(pathSource);
 
-  const configsCheckContent = allConfigs.map(async (item) => ({
-    label: item,
-    langObj: await getJsonFromFile(item, host),
-  }));
+  const configsCheckContent = await Promise.all(
+    allConfigs.map(async (item) => ({
+      label: item,
+      langObj: await getJsonFromFile(item, host),
+    }))
+  );
 
   const filesCheckContent = sourceFilesPaths.map((item) => ({
     path: item,
