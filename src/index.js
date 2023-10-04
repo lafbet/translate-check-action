@@ -25,8 +25,8 @@ function mergeObjects(object1, object2) {
 }
 
 async function getJsonFromFile(name, host) {
-  const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
-  const urlLafa = `https://t.lafa.bet/api/locale/result?code=${name}&host=lafa`;
+  const urlValor = `https://t.valor.bet/api/locale/result?code=${name}&host=valor`;
+  const urlLafa = `https://t.valor.bet/api/locale/result?code=${name}&host=lafa`;
   try {
     const responses = await Promise.all([
       axios.get(urlValor),

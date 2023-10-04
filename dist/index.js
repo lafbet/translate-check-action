@@ -26783,8 +26783,8 @@ function mergeObjects(object1, object2) {
 }
 
 async function getJsonFromFile(name, host) {
-  const urlValor = `https://t.lafa.bet/api/locale/result?code=${name}&host=valor`;
-  const urlLafa = `https://t.lafa.bet/api/locale/result?code=${name}&host=lafa`;
+  const urlValor = `https://t.valor.bet/api/locale/result?code=${name}&host=valor`;
+  const urlLafa = `https://t.valor.bet/api/locale/result?code=${name}&host=lafa`;
   try {
     const responses = await Promise.all([
       axios.get(urlValor),
@@ -26819,7 +26819,7 @@ const getMain = async (name, host) => {
 };
 
 const getConfigs = async (mainConfigName) => {
-  const url = `https://t.lafa.bet/api/locale`;
+  const url = `https://t.valor.bet/api/locale`;
   try {
     const response = await axios.get(url);
     return Object.keys(response.data).filter((item) => item !== mainConfigName);
