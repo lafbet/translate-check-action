@@ -26819,7 +26819,7 @@ const getMain = async (name, host) => {
 };
 
 const getConfigs = async (mainConfigName) => {
-  const url = `https://t.valor.bet/api/locale`;
+  const url = `https://t.valor.bet/api/language`;
   try {
     const response = await axios.get(url);
     return Object.keys(response.data).filter((item) => item !== mainConfigName);
